@@ -15,8 +15,11 @@ defmodule KVServerTest do
     %{socket: socket}
   end
 
+  @tag :distributed
   test "server interaction", %{socket: socket} do
     assert send_and_recv(socket, "UNKNOWN shopping\r\n") == "UNKNOWN COMMAND\r\n"
+    # the below line fails if the bar node is not started afresh
+    # since the shopping bucket still exists on the bar node
     assert send_and_recv(socket, "GET shopping eggs\r\n") == "NOT FOUND\r\n"
     assert send_and_recv(socket, "CREATE shopping\r\n") == "OK\r\n"
     assert send_and_recv(socket, "PUT shopping eggs 3\r\n") == "OK\r\n"
